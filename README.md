@@ -4,6 +4,9 @@
 
 ### Manage multiple Neo4j instances from the command line.
 
+![img](http://g.recordit.co/YRVhOJKXdj.gif)
+
+
 #### Requirements
 
 * PHP5.4+
