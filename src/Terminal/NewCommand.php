@@ -87,6 +87,8 @@ class NewCommand extends Command
             exec('tar -xzf '.$v.'.tar.gz');
             chdir($cwd);
             $this->cleanUp($tarGZPath, $versionCacheDir, $extractedDir);
+            $process = new Process('cp -Rf '.$versionCacheDir.' '.$dir);
+            $process->run();
         } elseif (is_dir($versionCacheDir)) {
             $output->writeln('<info>Cache version '.$this->neo4jVersion.' found in "'.$versionCacheDir.'"');
             $process = new Process('cp -Rf '.$versionCacheDir.' '.$dir);
