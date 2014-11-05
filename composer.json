@@ -1,17 +1,20 @@
 {
-  "require": {
-    "symfony/console": "~2.6-beta1",
-    "symfony/dependency-injection": "~2.6-beta1",
-    "guzzlehttp/guzzle": "~4.0",
-    "symfony/finder": "~2.6-beta1",
-    "symfony/process": "~2.6-beta1",
-    "symfony/filesystem": "~2.6-beta1",
-    "symfony/yaml": "~2.6-beta1",
-    "guzzlehttp/progress-subscriber": "~1.1"
-  },
-  "autoload": {
-    "psr-4": {
-      "Neoxygen\\NeoToolkit\\": "src/"
+    "require": {
+        "symfony/console": "~2.6-beta1",
+        "symfony/dependency-injection": "~2.6-beta1",
+        "guzzlehttp/guzzle": "~4.0",
+        "symfony/finder": "~2.6-beta1",
+        "symfony/process": "~2.6-beta1",
+        "symfony/filesystem": "~2.6-beta1",
+        "symfony/yaml": "~2.6-beta1",
+        "guzzlehttp/progress-subscriber": "~1.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Neoxygen\\NeoToolkit\\": "src/"
+        }
+    },
+    "scripts": {
+        "post-install-cmd": "Neoxygen\\NeoToolkit\\Composer\\Script\\ConfigDirectory::create"
     }
-  }
 }
