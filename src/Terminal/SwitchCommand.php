@@ -73,7 +73,7 @@ class SwitchCommand extends Command
                 }
             }
             if (null === $location) {
-                exit('error');
+                throw new \RuntimeException('Could not determine the store directory of the running database');
             }
             $location = str_replace('/data/graph.db', '', $location);
             if ($location == $ilocation) {
