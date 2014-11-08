@@ -21,7 +21,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Neoxygen\\NeoToolkit\\Tests\\": "tests/"
+            "Neoxygen\\NeoToolkit\\Tests\\": "tests/Neoxygen/NeoClient/Tests"
         }
     },
     "scripts": {
