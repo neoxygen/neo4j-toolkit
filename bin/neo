@@ -6,7 +6,8 @@ require_once __DIR__.'/../vendor/autoload.php';
 use Neoxygen\NeoToolkit\Terminal\AboutCommand,
     Neoxygen\NeoToolkit\Terminal\NewCommand,
     Neoxygen\NeoToolkit\Terminal\ListCommand,
-    Neoxygen\NeoToolkit\Terminal\SwitchCommand;
+    Neoxygen\NeoToolkit\Terminal\SwitchCommand,
+    Neoxygen\NeoToolkit\Terminal\StopCommand;
 use Symfony\Component\Console\Application;
 
 $appVersion = '0.1.0-dev';
@@ -16,6 +17,7 @@ $application = new Application();
 $about = new AboutCommand($appVersion, $latestNeo4jVersion);
 $application->add($about);
 $application->add(new NewCommand($appVersion, $latestNeo4jVersion));
+$application->add(new StopCommand($appVersion, $latestNeo4jVersion));
 $application->add(new ListCommand($appVersion, $latestNeo4jVersion));
 $application->add(new SwitchCommand($appVersion, $latestNeo4jVersion));
 $application->setDefaultCommand($about->getName());

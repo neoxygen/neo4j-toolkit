@@ -2,10 +2,14 @@
 
 namespace Neoxygen\NeoToolkit;
 
+use GuzzleHttp\Client,
+    GuzzleHttp\Exception\RequestException;
 use Symfony\Component\Yaml\Yaml;
 
 class Factory
 {
+    private static $client;
+
     public static function getHomeDir()
     {
         if (!getenv('HOME')) {
@@ -68,5 +72,41 @@ class Factory
             'instances' => []
         ];
         return self::setConfig($default);
+    }
+
+    public static function getClient()
+    {
+        if (null === self::$client) {
+            self::$client = new Client();
+        }
+
+        return self::$client;
+    }
+
+    public static function checkRunningViaJmx($port, $storeLocation)
+    {
+        $jmx = 'http://localhost:' . $port . '/db/manage/server/jmx/domain/org.neo4j/instance%3Dkernel%230%2Cname%3DKernel';
+        $client = self::getClient();
+
+        try {
+            $kernel = $client->get($jmx);
+            $response = (string)$kernel->getBody();
+            $info = json_decode($response, true);
+            $location = null;
+            foreach ($info[0]['attributes'] as $info) {
+                if ($info['name'] == 'StoreDirectory') {
+                    $location = $info['value'];
+                    $location = str_replace('/data/graph.db', '', $location);
+                    if ($location == $storeLocation) {
+                        return true;
+                    }
+                }
+            }
+        } catch (RequestException $e) {
+
+            return false;
+        }
+
+        return false;
     }
 }

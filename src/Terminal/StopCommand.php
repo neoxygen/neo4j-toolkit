@@ -12,16 +12,17 @@
 namespace Neoxygen\NeoToolkit\Terminal;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Process\Process;
 use Neoxygen\NeoToolkit\Factory;
-use GuzzleHttp\Client,
-    GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Client;
 
 /**
  * This command provides information about NeoToolkit.
  */
-class ListCommand extends Command
+class StopCommand extends Command
 {
     private $appVersion;
 
@@ -38,31 +39,41 @@ class ListCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('db:list')
-            ->setDescription('List all the Neo4j instances registered in NeoToolkit');
+            ->setName('db:stop')
+            ->addArgument('name', InputArgument::REQUIRED)
+            ->setDescription('Stop the given instance name');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->writeStartMessage($output);
         $config = Factory::getConfig();
-        if (empty($config['instances'])) {
-            $output->writeln('<info>No Neo4j instances registered</info>');
-        } else {
-            $table = $this->getHelper('table');
-            $table
-                ->setHeaders(array('NAME', 'VERSION', 'HTTP_PORT', 'LOCATION', 'RUNNING'));
-
-            foreach ($config['instances'] as $name => $props) {
-                $running = Factory::checkRunningViaJmx($props['http_port'], $props['location']) ? '✔' : '';
-                $table->addRow(
-                    array(
-                        $name, $props['version'], $props['http_port'], $props['location'], $running
-                    )
-                );
-            }
-            $table->render($output);
+        $name = $input->getArgument('name');
+        if (!array_key_exists($name, $config['instances'])) {
+            $output->writeln('<error>'.sprintf('The instance "%s" is not registered', $name).'</error>');
+            exit();
         }
+        $port = $config['instances'][$name]['http_port'];
+        $location = $config['instances'][$name]['location'];
+        if (!Factory::checkRunningViaJmx($port, $location)) {
+            $output->writeln('<info>'.sprintf('The instance "%s" is not running', $name));
+            exit();
+        }
+        $stop = new Process($location.'/bin/neo4j stop');
+        $stop->run(function ($type, $buffer) {
+            if (Process::ERR === $type) {
+                echo $buffer;
+            } else {
+                echo $buffer;
+            }
+        });
+        sleep(2);
+        if (Factory::checkRunningViaJmx($port, $location)) {
+            $output->writeln('<error>'.sprintf('The instance "%s" could not be stopped', $name).'</error>');
+            exit();
+        }
+        $output->writeln('<info>'.sprintf('The instance "%s" has been successfully stopped', $name).'</info>');
+
     }
 
     protected function writeStartMessage(OutputInterface $output)
