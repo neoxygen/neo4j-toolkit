@@ -17,11 +17,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 use Neoxygen\NeoToolkit\Factory;
+use GuzzleHttp\Client;
 
 /**
  * This command provides information about NeoToolkit.
  */
-class StopCommand extends Command
+class StartCommand extends Command
 {
     private $appVersion;
 
@@ -35,9 +36,9 @@ class StopCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('db:stop')
+            ->setName('db:start')
             ->addArgument('name', InputArgument::REQUIRED)
-            ->setDescription('Stop the given instance name');
+            ->setDescription('Start the given instance name');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -51,11 +52,11 @@ class StopCommand extends Command
         }
         $port = $config['instances'][$name]['http_port'];
         $location = $config['instances'][$name]['location'];
-        if (!Factory::checkRunningViaJmx($port, $location)) {
-            $output->writeln('<info>'.sprintf('The instance "%s" is not running', $name));
+        if (Factory::checkRunningViaJmx($port, $location)) {
+            $output->writeln('<info>'.sprintf('The instance "%s" is already running', $name));
             exit();
         }
-        $stop = new Process($location.'/bin/neo4j stop');
+        $stop = new Process($location.'/bin/neo4j start');
         $stop->run(function ($type, $buffer) {
             if (Process::ERR === $type) {
                 echo $buffer;
@@ -63,8 +64,9 @@ class StopCommand extends Command
                 echo $buffer;
             }
         });
-        sleep(2);
-        if (Factory::checkRunningViaJmx($port, $location)) {
+        $output->writeln('<comment>Checking Api accessibility...</comment>');
+        sleep(3);
+        if (!Factory::checkRunningViaJmx($port, $location)) {
             $output->writeln('<error>'.sprintf('The instance "%s" could not be stopped', $name).'</error>');
             exit();
         }
