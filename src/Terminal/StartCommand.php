@@ -56,8 +56,8 @@ class StartCommand extends Command
             $output->writeln('<info>'.sprintf('The instance "%s" is already running', $name));
             exit();
         }
-        $stop = new Process($location.'/bin/neo4j start');
-        $stop->run(function ($type, $buffer) {
+        $start = new Process($location.'/bin/neo4j start');
+        $start->run(function ($type, $buffer) {
             if (Process::ERR === $type) {
                 echo $buffer;
             } else {
@@ -70,7 +70,7 @@ class StartCommand extends Command
             $output->writeln('<error>'.sprintf('The instance "%s" could not be stopped', $name).'</error>');
             exit();
         }
-        $output->writeln('<info>'.sprintf('The instance "%s" has been successfully stopped', $name).'</info>');
+        $output->writeln('<info>'.sprintf('The instance "%s" has been successfully started', $name).'</info>');
 
     }
 
